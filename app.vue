@@ -1,7 +1,7 @@
 <template>
   <div>
     <header
-      class="flex justify-between px-4 md:px-32 mt-14 border-b pb-3 border-[#9C9C9C]"
+      class="flex justify-between px-4 md:px-24 mt-14 border-b pb-3 border-[#9C9C9C]"
     >
       <h1 class="text-xl font-bold py-1">Gallery</h1>
       <label
@@ -18,7 +18,7 @@
       />
     </header>
     <div
-      class="flex flex-wrap px-4 md:px-36 gap-4 mt-28 md:justify-between lg:justify-start mb-10"
+      class="flex flex-wrap px-4 md:px-28 gap-4 mt-28 md:justify-between lg:justify-start mb-10"
       v-if="uploadedImages.length"
     >
       <div
@@ -51,17 +51,19 @@ export default defineComponent({
   data() {
     return {
       uploadedImages: [] as string[],
+      urlApi:
+        "https://vintrackers.buildonlinestaging.com/upload/images/" as string,
     };
   },
   methods: {
     async uploadImageToServer(base64Image: string) {
       try {
-        const response = await fetch("/upload-image", {
+        const response = await fetch(this.urlApi, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ image: base64Image }),
+          body: JSON.stringify({ images: [base64Image] }),
         });
         if (response.ok) {
           console.log("Image uploaded successfully.");
@@ -91,28 +93,8 @@ export default defineComponent({
         };
       }
     },
-    async deleteImageFromServer(index: number) {
-      try {
-        // Assuming there's an API endpoint for deleting image at '/delete-image'
-        const response = await fetch("/delete-image", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ index }),
-        });
-        if (response.ok) {
-          console.log("Image deleted successfully.");
-        } else {
-          throw new Error("Failed to delete image.");
-        }
-      } catch (error) {
-        console.error("Error deleting image:", error);
-      }
-    },
     deleteImage(index: number) {
       this.uploadedImages.splice(index, 1);
-      this.deleteImageFromServer(index);
     },
   },
 });
