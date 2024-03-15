@@ -54,6 +54,24 @@ export default defineComponent({
     };
   },
   methods: {
+    async uploadImageToServer(base64Image: string) {
+      try {
+        const response = await fetch("/upload-image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: base64Image }),
+        });
+        if (response.ok) {
+          console.log("Image uploaded successfully.");
+        } else {
+          throw new Error("Failed to upload image.");
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    },
     async handleFileUpload(event: Event) {
       const target = event.target as HTMLInputElement;
       const files = target.files;
@@ -68,12 +86,33 @@ export default defineComponent({
         reader.onload = () => {
           if (typeof reader.result === "string") {
             this.uploadedImages.push(reader.result);
+            this.uploadImageToServer(reader.result);
           }
         };
       }
     },
+    async deleteImageFromServer(index: number) {
+      try {
+        // Assuming there's an API endpoint for deleting image at '/delete-image'
+        const response = await fetch("/delete-image", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ index }),
+        });
+        if (response.ok) {
+          console.log("Image deleted successfully.");
+        } else {
+          throw new Error("Failed to delete image.");
+        }
+      } catch (error) {
+        console.error("Error deleting image:", error);
+      }
+    },
     deleteImage(index: number) {
       this.uploadedImages.splice(index, 1);
+      this.deleteImageFromServer(index);
     },
   },
 });
